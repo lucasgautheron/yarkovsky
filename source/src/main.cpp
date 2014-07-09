@@ -13,56 +13,6 @@ int mouse_x = 0, mouse_y = 0;
 
 int lastmillis = 0, curmillis = 0, diffmillis;
 
-/*void calculatetemperature()
-{
-    double temp[64], tempn[64];
-    const int DEPTHDIV = 64;
-    const double dt = 0.1;
-    const double depth = 1;
-    const double dz = depth/double(DEPTHDIV);
-    const double diffusivity = 1.2e-6;
-    const double conductivity = 2.9;
-
-    for(int i = 0; i < DEPTHDIV; ++i)
-    {
-        temp[i] = tempn[i] = 200.0;
-    }
-
-    double time = 0.0;
-    FILE *fp = fopen("wave.dat", "w+");
-    int j = 0;
-    while(time < 200000)
-    {
-        for(int i = 1; i < DEPTHDIV - 1; ++i)
-        {
-            tempn[i] = temp[i] + dt * diffusivity * (temp[i+1] - 2*temp[i] + temp[i-1]) / (dz * dz);
-        }
-
-        double light = 300 * max(0.0, (0.1+0.8*cos(2*D_PI*(time-100)/40000)));
-        tempn[0] = tempn[1] + (dz/conductivity) * (light - pow(temp[0], 4) * C_STEFANBOLTZMANN);
-        tempn[DEPTHDIV-1] = tempn[DEPTHDIV-2];
-
-        for(int i = 0; i < DEPTHDIV; ++i)
-        {
-            temp[i] = tempn[i];
-        }
-
-        time += dt;
-        if(!(j%7001))
-        {
-            for(int i = 0; i < DEPTHDIV-20; ++i)
-            {
-                fprintf(fp, "%e %e %e\n", time/3600.0, double(i) * dz, temp[i]);
-            }
-            fprintf(fp, "\n");
-        }
-        //if(!(j&1001)) fprintf(fp, "%e %e %e\n", time/3600.0, temp[0]);
-        
-        ++j;
-    }
-    fclose(fp);
-}*/
-
 bool paused = false;
 int main(int argc, char *argv[])
 {
