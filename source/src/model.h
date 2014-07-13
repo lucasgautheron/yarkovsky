@@ -1,18 +1,5 @@
 #define TEMPDIV 128     // divisions spatiales
-                        // (pour resoudre dT/dt = grad . (grad T))
-#define OCTDIV 7 // 2^7 = 128 !!
-
-struct TexCoord
-{
-    double x, y;
-};
-
-struct cube
-{
-    int x, y, z;
-    cube() {}
-    cube(int x, int y, int z) : x(x), y(y), z(z) {}
-};
+                        // (pour resoudre dT/dt = div . (grad T))
 
 struct Face
 {
@@ -23,11 +10,6 @@ struct Face
     double temp[TEMPDIV], tempn[TEMPDIV]; // temperature;
     double viewfactor;
     double h; // hauteur en m
-
-    int offsets[3], cubes[3], totalcubes;
-    std::vector<cube *> c;
-    std::vector<Face *> neighbors;
-    //TexCoord *tex[4];
 };
 
 // The 3D-Model structure
@@ -146,25 +128,6 @@ struct Model
         o = (bbmax+bbmin)/2.0;
         delta = bbmax-bbmin;
         double size = max(delta.x, max(delta.y, delta.z));
-
-        // calcul des tétrahèdres voisins (càd ceux ayant un sommet en commun)
-        for(int i = 0; i < vertices_faces.size(); ++i) // pour chaque sommet
-        {
-            for(int j = 0; j < vertices_faces[i]->size(); ++j) // on liste les faces
-            {
-                for(int k = 0; k < vertices_faces[i]->size(); ++k) // deux fois
-                {
-                    if(j != k) vertices_faces[i]->at(j)->neighbors.push_back(vertices_faces[i]->at(k));
-                }
-            }
-        }
-
-        for(int i = 0; i < faces.size(); ++i)
-        {
-            Face *f = faces[i];
-            f->x_axis = (f->neighbors[0]->pos - f->pos); f->x_axis.normalize();
-            f->y_axis = f->n ^ f->x_axis;
-        }
 
         DELETEV(normals);
         return true;
