@@ -3,7 +3,7 @@
 #ifdef GUI
 
 SDL_Surface *screen = NULL;
-std::vector<GPFont *> fonts;
+//std::vector<GPFont *> fonts;
 
 vec angle(0,0,0);
 double zoom = 0.01;
@@ -39,7 +39,7 @@ void init_sdl()
 
 void load_fonts()
 {
-    fonts.push_back(new GPFont("consola.ttf", 12));
+    //fonts.push_back(new GPFont("consola.ttf", 12));
     //fonts.push_back(new GPFont("arial.ttf", 12));
     //fonts.push_back(new GPFont("consola.ttf", 12));
 }
@@ -77,7 +77,7 @@ void render()
 
 void draw_text(const char *text, double x, double y, double z, int r, int g, int b, int font)
 {
-    glPushMatrix();
+    /*glPushMatrix();
 
     glTranslated(x, y, z);
     glColor3ub(r, g, b);
@@ -85,7 +85,7 @@ void draw_text(const char *text, double x, double y, double z, int r, int g, int
     GPFont *ttf_font = (font >= 0 && font < fonts.size()) ? fonts[font] : fonts.back();
     if(!ttf_font) return;
     ttf_font->Print2D(text);
-    glPopMatrix();
+    glPopMatrix();*/
 }
 
 void draw_label(string text, int x, int y)

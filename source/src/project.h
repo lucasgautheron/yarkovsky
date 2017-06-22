@@ -24,8 +24,13 @@
 #endif
 
 #ifdef GUI
-#include <gl/gl.h>
-#include <gl/glu.h>
+#if defined(WIN32)
+  #include <gl/gl.h>
+  #include <gl/glu.h>
+#else
+  #include <GL/gl.h>
+  #include <GL/glu.h>
+#endif
 
 #include <SDL/SDL.h>
 #include "SDL/SDL_ttf.h"
@@ -33,7 +38,11 @@
 #include "SDL/SDL_thread.h"
 #endif
 
-#include "zlib/zlib.h"
+#if defined(WIN32)
+  #include "zlib/zlib.h"
+#else
+  #include "zlib.h"
+#endif
 
 using namespace std;
 

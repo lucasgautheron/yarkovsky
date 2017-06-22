@@ -134,7 +134,7 @@ void init()
 void callback_quit()
 {
 #ifdef GUI
-    TTF_Quit();
+    //TTF_Quit();
     SDL_Quit();
 #endif
     exit(EXIT_SUCCESS);

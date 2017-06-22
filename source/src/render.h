@@ -1,5 +1,5 @@
 #include "sdldglutils/sdlglutils.h"
-#include "fonts.h"
+//#include "fonts.h"
 
 struct color
 {
