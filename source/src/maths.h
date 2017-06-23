@@ -348,3 +348,63 @@ inline matrix tetrahedronmatrix(vec a, vec b, vec c)
 
     return im;
 }
+
+#define EPSILON 0.00001
+inline bool ray_intersects_triangle(vec& v1, vec& v2, vec& v3, vec& orig, vec& dir)
+{
+ vec e1,e2,pvec,qvec,tvec;
+
+ e1 = v2-v1;
+ e2 = v3-v1;
+
+ pvec = dir^e2;
+ dir.normalize();
+
+ float det = pvec.dot(e1);
+#ifdef TEST_CULL
+if (det <EPSILON)
+{
+
+    return false;
+}
+tvec = orig-v1;
+float u = tvec.dot(pvec);
+if (u < 0.0 || u > det)
+{
+
+    return false;
+}
+qvec = tvec ^ e1;
+float v = dir.dot(qvec);
+if (v < 0.0f || v + u > det)
+{
+
+    return false;
+}
+#else
+ if (det < EPSILON && det > -EPSILON )
+ {
+
+     return false;
+ }
+
+ float invDet = 1.0f / det;
+ tvec = orig-v1;
+
+ float u = invDet * tvec.dot(pvec);
+ if (u <0.0f || u > 1.0f)
+ {
+
+     return false;
+ }
+ qvec = tvec ^ e1;
+// NORMALIZE(qvec);
+ float v = invDet* qvec.dot(dir);
+ if (v < 0.0f || u+v > 1.0f)
+ {
+
+     return false;
+ }
+#endif
+ return true;
+}

@@ -10,6 +10,7 @@ struct Face
     double temp[TEMPDIV], tempn[TEMPDIV]; // temperature;
     double viewfactor;
     double h; // hauteur en m
+    bool enlightened;
 };
 
 // The 3D-Model structure

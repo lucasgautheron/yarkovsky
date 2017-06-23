@@ -1,2 +1,2 @@
 cd bin
-./phys geographos > ../log.txt
+./phys geographos
