@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     if (argc > 2)
     {
         nloops = atoi(argv[2]);
+        printf("Set to perform %d loops before stopping.\n", nloops);
     }
 
     asteroid1.loadmdl(argv[1]);
@@ -119,13 +120,10 @@ int main(int argc, char *argv[])
         if(diffmillis < 5) SDL_Delay(5-diffmillis);
     }
 #else
-    for(;;)
+    for(int i = 1; i != nloops; ++i)
     {
-        for(int i = 1; i != nloops; ++i)
-        {
-            asteroid1.calcloop();
-            if (i % 20 == 0) printf("20 loops executed");
-        }
+        asteroid1.calcloop();
+        if (i % 20 == 0) printf("20 loops executed");
     }
 #endif
     callback_quit();
