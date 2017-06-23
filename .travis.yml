@@ -9,4 +9,4 @@ addons:
       - libsdl-dev
       - libsdl-image1.2-dev
 
-script: cd source/src && make GUI=1 && make clean && make && make install && ./run 100
+script: cd source/src && make GUI=1 && make clean && make && make install && cd ../../bin && ./phys geographos 100
