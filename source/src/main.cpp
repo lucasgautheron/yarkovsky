@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
         else if(!pressed && !keyreleased) keyreleased = true;
         
         render();
-        if(!paused) for(int i = 0; i < 2; ++i) asteroid1.calcloop();
+        if(!paused) asteroid1.calcloop();
 
         if(diffmillis < 5) SDL_Delay(5-diffmillis);
     }

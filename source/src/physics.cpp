@@ -102,21 +102,22 @@ void Asteroid::calcviewfactors()
         f->enlightened = true;
         vec n = f->n;
 
-        for(int j = 0; j < mdl->faces.size(); ++j)
+        /*for(int j = 0; j < mdl->faces.size(); ++j)
         {
             if (j == i) continue;
             Face *tf = mdl->faces[j];
             vec delta = f->pos - tf->pos;
             // if light meets test face first AND same raylight intersects both
-            if (delta.dot(raydir) >= 0 && ray_intersects_triangle(*f->vertices[0], *f->vertices[1], *f->vertices[2], tf->pos, raydir))
+            if (delta.dot(raydir) < 0 && ray_intersects_triangle(*f->vertices[0], *f->vertices[1], *f->vertices[2], tf->pos, raydir))
             {
                 f->enlightened = false;
                 break;
             }
-        }
+        }*/
 
         n.mul(rotmatrix);
         f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : 0;
+        //f->viewfactor = f->enlightened ? 1 : -1;
     }
 }
 
@@ -263,7 +264,7 @@ void Asteroid::move(double dt)
     if((loops % 10) == 0)
     {
         double da = 2 * dE * semiaxis * semiaxis / (C_SUNCONST * mass);
-        log->printf("%.3f %e %e %e %e %e %e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, da/dt, mdl->faces[0]->temp[0], mdl->faces[1]->temp[0]);
+        log->printf("%.3f %e %e %e %e %e %e %e %e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, da/dt, mdl->faces[0]->temp[0], mdl->faces[mdl->faces.size()/4]->temp[0], mdl->faces[2*mdl->faces.size()/4]->temp[0], mdl->faces[3*mdl->faces.size()/4]->temp[0]);
         rotmatrix.print();
     }
 }

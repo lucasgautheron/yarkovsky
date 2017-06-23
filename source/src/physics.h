@@ -160,6 +160,7 @@ struct Asteroid
             if(sscanf(line, "scale = %lf", &scale)) continue;
             if(sscanf(line, "conductivity = %lf", &conductivity)) continue;
             if(sscanf(line, "diffusivity = %lf", &diffusivity)) continue;
+            if(sscanf(line, "density = %lf", &density)) continue;
             if(sscanf(line, "pos = (%lf, %lf, %lf)", &pos.x, &pos.y, &pos.z)) continue;
             if(sscanf(line, "plan = (%lf, %lf, %lf)", &plan.x, &plan.y, &plan.z)) continue;
             if(sscanf(line, "rot = (%lf, %lf, %lf)", &rotvel.x, &rotvel.y, &rotvel.z)) continue;

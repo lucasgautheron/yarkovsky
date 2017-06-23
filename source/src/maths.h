@@ -349,7 +349,8 @@ inline matrix tetrahedronmatrix(vec a, vec b, vec c)
     return im;
 }
 
-#define EPSILON 0.00001
+#define EPSILON 1e-10
+//#define TEST_CULL 1 
 inline bool ray_intersects_triangle(vec& v1, vec& v2, vec& v3, vec& orig, vec& dir)
 {
  vec e1,e2,pvec,qvec,tvec;
@@ -408,3 +409,4 @@ if (v < 0.0f || v + u > det)
 #endif
  return true;
 }
+#undef EPSILON
