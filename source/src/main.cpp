@@ -14,6 +14,8 @@ int mouse_x = 0, mouse_y = 0;
 int lastmillis = 0, curmillis = 0, diffmillis;
 
 bool paused = false;
+int nloops = 0;
+
 int main(int argc, char *argv[])
 {
     init();
@@ -23,6 +25,12 @@ int main(int argc, char *argv[])
         callback_quit();
         return EXIT_FAILURE;
     }
+
+    if (argc > 2)
+    {
+        nloops = atoi(argv[2]);
+    }
+
     asteroid1.loadmdl(argv[1]);
     asteroid1.time = 0.0;
     asteroid1.angle = vec(0, 0, 0);
@@ -113,9 +121,11 @@ int main(int argc, char *argv[])
 #else
     for(;;)
     {
-        clock_t t = clock();
-        for(int i = 0; i < 20; ++i) asteroid1.calcloop();
-        printf("20 loops in %.2f s\n", (clock()-t)/1000.0f);
+        for(int i = 1; i != nloops; ++i)
+        {
+            asteroid1.calcloop();
+            if (i % 20 == 0) printf("20 loops executed");
+        }
     }
 #endif
     callback_quit();

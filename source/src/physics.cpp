@@ -89,6 +89,19 @@ void Asteroid::calcimatrix()
     inertia_det = det3x3(inertia);
 }*/
 
+void Asteroid::calcviewfactors()
+{
+    #pragma omp parallel for
+    for(int i = 0; i < mdl->faces.size(); ++i)
+    {
+        Face *f = mdl->faces[i];
+        f->enlightened = false;
+        vec n = f->n;
+        n.mul(rotmatrix);
+        f->viewfactor = n.dot(pos)/distance_to_sun;
+    }
+}
+
 // Calcul de la temperature.
 inline void Asteroid::calctemperature(Face *f)
 {
@@ -217,14 +230,8 @@ void Asteroid::move(double dt)
         rotvel[i] = det3x3(m)/inertia_det;
     }
     rotaccel = (rotvel-rot)/dt;
-    
-    #pragma omp parallel for
-    for(int i = 0; i < mdl->faces.size(); ++i)
-    {
-        vec n = mdl->faces[i]->n;
-        n.mul(rotmatrix);
-        mdl->faces[i]->viewfactor = n.dot(pos)/distance_to_sun;
-    }
+
+    calcviewfactors();
 
     accel = dP/mass;
 

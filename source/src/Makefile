@@ -1,5 +1,15 @@
 CC = g++
-CFLAGS = -Wall -O3 -fopenmp -D GUI
+
+CFLAGS = -Wall -O3 -fopenmp
+
+ifndef GUI
+	GUI = 0
+endif
+
+ifeq ($(GUI), 1)
+	override CFLAGS+= -D GUI
+endif
+
 EXEC_NAME = phys
 INCLUDES =  -I../include/ `sdl-config --cflags`
 LIBS = -lm `sdl-config --libs` -lz  -fopenmp -lSDL -lSDL_image -lz -lGL -lGLU

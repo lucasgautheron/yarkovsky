@@ -69,6 +69,7 @@ struct Asteroid
     void calcsolid(); // calcule le volume, le centre de masse, etc.
     void calcimatrix(); // calcule la matrice d'inertie
 
+    void calcviewfactors();
     inline void calctemperature(Face *f);
 
     // calcul des forces
