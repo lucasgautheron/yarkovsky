@@ -260,7 +260,12 @@ void Asteroid::move(double dt)
 
     // log :
     vec rotdir = rot; rotdir.normalize();
-    if((loops % 10) == 0) { log->printf("%.3f;%e;%e;%e;%e;%e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, mdl->faces[0]->temp[0], mdl->faces[1]->temp[0]); rotmatrix.print(); }
+    if((loops % 10) == 0)
+    {
+        double da = 2 * dE * semiaxis * semiaxis / (C_SUNCONST * mass);
+        log->printf("%.3f %e %e %e %e %e %e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, da/dt, mdl->faces[0]->temp[0], mdl->faces[1]->temp[0]);
+        rotmatrix.print();
+    }
 }
 
 void Asteroid::calcloop()
