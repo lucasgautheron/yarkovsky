@@ -39,6 +39,9 @@ count = 0
 means = [0] * len(lines[0])
 for l in lines:
     n = 0
+    if l[0] > stop:
+        break
+
     means = [x + y for x, y in zip(means, l)]
     count = count + 1
 
