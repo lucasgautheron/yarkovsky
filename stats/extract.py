@@ -3,7 +3,7 @@ import sys
 from decimal import Decimal
 
 period = Decimal(sys.argv[2])
-shift = period/4
+shift = period/100
 
 cols = []
 lines = []
@@ -19,7 +19,7 @@ with open(sys.argv[1], 'r') as csvfile:
         n = 0
         for col in row:
             if not n in cols:
-                print(n)
+                #print(col)
                 cols.append(0)
 
             cols[n] = Decimal(col)
@@ -36,17 +36,13 @@ periods = int(delta/period)
 stop = shift + period*periods
 
 count = 0
+means = [0] * len(lines[0])
 for l in lines:
     n = 0
-    for col in lines[l]:
-        if not n in means:
-            print(n)
-            cols.append(0)
-        means[n] = means[n] + l[col]
+    means = [x + y for x, y in zip(means, l)]
     count = count + 1
 
-for col in means:
-    means[col] = means[col] / count
+means = [x/count for x in means]
 
 
 print(means)
