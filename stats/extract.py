@@ -26,7 +26,7 @@ with open(sys.argv[1], 'r') as csvfile:
             n = n + 1
         
         lines.append(cols)
-        if (len(lines) % 1000 == 0)
+        if (len(lines) % 1000 == 0):
             print(len(lines))
 
 print(len(lines))
