@@ -116,7 +116,7 @@ void Asteroid::calcviewfactors()
         }*/
 
         n.mul(rotmatrix);
-        f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : 0;
+        f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : -0.0001;
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
 }

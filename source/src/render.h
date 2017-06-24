@@ -23,3 +23,4 @@ void draw_text(const char *text, double x, double y, double z, int r = 255, int 
 // 3D
 void renderframe();
 void rendermodel(Model &mdl);
+void renderoctree(OctreeNode *octree);

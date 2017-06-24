@@ -68,10 +68,11 @@ void render()
     glScaled(zoom, zoom, zoom);
     extern bool paused;
     renderframe();
-    if(!paused) rendermodel(*asteroid1.mdl);
-#ifdef SEASONAL
-    rendervoxel(asteroid1.mdl->voxel);
-#endif
+    if(!paused)
+    {
+        rendermodel(*asteroid1.mdl);
+    }
+    renderoctree(asteroid1.mdl->octree);
     SDL_GL_SwapBuffers();
 }
 
@@ -189,5 +190,42 @@ void rendermodel(Model &mdl)
 		glVertex3dv((mdl.bbmin+delta_x+delta_y).v); glVertex3dv((mdl.bbmin+delta_z+delta_x+delta_y).v);
     glEnd();
     glEnable(GL_LIGHTING);
+}
+
+void renderoctree(OctreeNode *o)
+{
+    if(!o) return;
+    if(!o->leaf)
+    {
+        for(int i = 0; i < 8; ++i) renderoctree(o->children[i]);
+        return;
+    }
+
+    if(!o->faces.size()) return; // decommenter pour afficher les octants feuille seulement
+
+    glColor3f(1.0, 0.0, 0);
+    
+    vec delta = vec(o->size, o->size, o->size);
+    vec inf = o->midpoint-delta/2.0, sup = o->midpoint+delta/2.0;
+    vec delta_x = vec(delta.x, 0, 0);
+    vec delta_y = vec(0, delta.y, 0);
+    vec delta_z = vec(0, 0, delta.z);
+
+    glBegin(GL_LINES);
+        glVertex3dv(inf.v); glVertex3dv((inf+delta_x).v);
+        glVertex3dv((inf+delta_x).v); glVertex3dv((inf+delta_x+delta_y).v);
+        glVertex3dv((inf+delta_x+delta_y).v); glVertex3dv((inf+delta_y).v);
+        glVertex3dv((inf+delta_y).v); glVertex3dv((inf).v);
+
+        glVertex3dv((inf+delta_z).v); glVertex3dv((inf+delta_x+delta_z).v);
+        glVertex3dv((inf+delta_x+delta_z).v); glVertex3dv((inf+delta_x+delta_y+delta_z).v);
+        glVertex3dv((inf+delta_x+delta_y+delta_z).v); glVertex3dv((inf+delta_y+delta_z).v);
+        glVertex3dv((inf+delta_y+delta_z).v); glVertex3dv((inf+delta_z).v);
+
+        glVertex3dv((inf).v); glVertex3dv((inf+delta_z).v);
+        glVertex3dv((inf+delta_x).v); glVertex3dv((inf+delta_z+delta_x).v);
+        glVertex3dv((inf+delta_y).v); glVertex3dv((inf+delta_z+delta_y).v);
+        glVertex3dv((inf+delta_x+delta_y).v); glVertex3dv((inf+delta_z+delta_x+delta_y).v);
+    glEnd();
 }
 #endif

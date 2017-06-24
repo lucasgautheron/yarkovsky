@@ -1,10 +1,10 @@
 CC = g++
 
-CFLAGS = -Wall -O3 -fopenmp
+CFLAGS = -Wall -O0 -g -fopenmp
 EXEC_NAME = phys
 INCLUDES =  -I../include/ `sdl-config --cflags`
 LIBS = -lm `sdl-config --libs` -lz  -fopenmp -lSDL -lSDL_image -lz 
-OBJ_FILES = main.o maths.o physics.o render.o stream.o tools.o
+OBJ_FILES = main.o maths.o physics.o octree.o render.o stream.o tools.o
 INSTALL_DIR = ../../bin/
 
 ifndef GUI

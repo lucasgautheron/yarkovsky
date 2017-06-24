@@ -11,6 +11,7 @@ struct Face
     double viewfactor;
     double h; // hauteur en m
     bool enlightened;
+    std::vector<OctreeNode *> nodes;
 };
 
 // The 3D-Model structure
@@ -26,13 +27,36 @@ struct Model
 
     vec bbmin, bbmax, delta, o; // model bounds
 
+    OctreeNode *octree;
+
     int tris;
 
-    Model(const char *filename, double scale) : filename(filename), scale(scale)
+    Model(const char *filename, double scale) : filename(filename), scale(scale), octree(NULL)
     {
         bbmin = vec(1e10, 1e10, 1e10);
         bbmax = -bbmin;
         tris = 0;
+    }
+
+    int build_octree()
+    {
+        if(!octree)
+        {
+            octree = new OctreeNode();
+        }
+
+        octree->size = max(delta.x, max(delta.y, delta.z));
+        octree->midpoint = (bbmin+bbmax)/2.0;
+        octree->min = bbmin;
+        octree->max = bbmax;
+        
+        for(unsigned int i = 0; i < faces.size(); ++i)
+        {
+            Face *f = faces[i];
+            octree->insert(f);
+        }
+
+        return 0;
     }
 
     bool load()
@@ -131,8 +155,11 @@ struct Model
         double size = max(delta.x, max(delta.y, delta.z));
 
         DELETEV(normals);
+
+        build_octree();
         return true;
     }
+    
 
     ~Model()
     {

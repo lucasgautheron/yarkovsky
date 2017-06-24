@@ -48,6 +48,7 @@ using namespace std;
 #include "tools.h"
 #include "stream.h"
 #include "maths.h"
+#include "octree.h"
 #include "model.h"
 #include "physics.h"
 #ifdef GUI
