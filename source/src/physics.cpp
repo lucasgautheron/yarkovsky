@@ -202,7 +202,7 @@ void Asteroid::move(double dt)
     omegamatrix[1][0] = +rotvel.z;
     omegamatrix[0][2] = +rotvel.y;
     omegamatrix[2][0] = -rotvel.y;
-    omegamatrix[2][1] = -rotvel.x;
+    omegamatrix[2][1] = +rotvel.x;
     omegamatrix[1][2] = -rotvel.x;
     omegamatrix.mul(omegamatrix, rotmatrix);
     rotmatrix = rotmatrix + omegamatrix * dt;
@@ -273,6 +273,9 @@ void Asteroid::calcloop()
 {
     calcgravity();
     calcemitted();
+    matrix m(3, 3);
+    getrotationmatrix(m, pos, vec(0, 0, -1));
+    m.print();
 
     move(timestep);
     time += timestep;
