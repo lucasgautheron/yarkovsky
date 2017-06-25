@@ -203,7 +203,7 @@ void Asteroid::move(double dt)
     omegamatrix[1][0] = +rotvel.z;
     omegamatrix[0][2] = +rotvel.y;
     omegamatrix[2][0] = -rotvel.y;
-    omegamatrix[2][1] = +rotvel.x;
+    omegamatrix[2][1] = -rotvel.x;
     omegamatrix[1][2] = -rotvel.x;
     omegamatrix.mul(omegamatrix, rotmatrix);
     rotmatrix = rotmatrix + omegamatrix * dt;
