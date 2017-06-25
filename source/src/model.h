@@ -104,6 +104,8 @@ struct Model
                 f->area = ((*f->vertices[1]-*f->vertices[0])^(*f->vertices[2]-*f->vertices[0])).norm()/2.0;
                 f->depth = 5.0;
 
+                f->h = min(f->depth, fabs(f->n.dot(*f->vertices[0])));
+
                 if(has_normal)
                 {
                     f->n = *normals[ni[0]-1];
@@ -118,8 +120,6 @@ struct Model
                 // L'erreur sur la norme est minime mais existe (blender doit faire ça grossièrement)
                 // Par contre il y a risque d'introduire une erreur sur la direction ?
                 if(f->n.dot(*f->vertices[0]) < 0) f->n = -f->n;
-
-                f->h = fabs(f->n.dot(*f->vertices[0]));
 
                 vertices_faces[vi[0]-1]->push_back(f);
                 vertices_faces[vi[1]-1]->push_back(f);
