@@ -139,7 +139,8 @@ inline void Asteroid::calctemperature(Face *f)
             dT *= timestep * diffusivity / (f->neighbors[0]->pos-f->pos).squaredlen();
             //dT /= float(f->neighbors.size());
         }*/
-        f->tempn[i] = f->temp[i] + timestep * diffusivity * ( (f->temp[i+1] - 2*f->temp[i] + f->temp[i-1]) / (dz * dz) + (f->temp[i+1]-f->temp[i-1]) / (2*dz * (i*dz - f->h)));
+        const double surf_derivative = 1/(f->h * (1-i*dz/f->h));
+        f->tempn[i] = f->temp[i] + timestep * diffusivity * ( (f->temp[i+1] - 2*f->temp[i] + f->temp[i-1]) / (dz * dz) + surf_derivative * (f->temp[i+1]-f->temp[i-1]) / (2*dz));
     }
 
     double light = f->viewfactor >= 0 ? (1-albedo) * (f->viewfactor * C_SOLARFLUX / (pos.squaredlen())) : 0;
