@@ -5,7 +5,7 @@ from decimal import Decimal
 period = Decimal(sys.argv[2])
 shift = period/5
 
-cols = []
+
 lines = []
 means = []
 max_time = 0
@@ -16,6 +16,7 @@ with open(sys.argv[1], 'r') as csvfile:
         if Decimal(row[0]) <= shift:
             continue
 
+        cols = []
         n = 0
         for col in row:
             if not n in cols:
@@ -41,7 +42,7 @@ periods = int(delta/period)
 
 stop = shift + period*periods
 
-print("From ", shift, " to ", max_time, " (", periods, " periods).")
+print("From ", shift, " to ", stop, " (", periods, " periods).")
 
 count = 0
 means = [0] * len(lines[0])
