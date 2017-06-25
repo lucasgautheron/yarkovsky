@@ -3,7 +3,7 @@ import sys
 from decimal import Decimal
 
 period = Decimal(sys.argv[2])
-shift = period/100
+shift = period/5
 
 cols = []
 lines = []
@@ -37,10 +37,11 @@ periods = int(delta/period)
 
 stop = shift + period*periods
 
+print("From ", shift, " to ", max_time, " (", periods, " periods).")
+
 count = 0
 means = [0] * len(lines[0])
 for l in lines:
-    n = 0
     if l[0] > stop:
         break
 
