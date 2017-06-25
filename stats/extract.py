@@ -22,7 +22,11 @@ with open(sys.argv[1], 'r') as csvfile:
                 #print(col)
                 cols.append(0)
 
-            cols[n] = Decimal(col)
+            try:
+                cols[n] = Decimal(col)
+            except:
+                print("Failed to cast ", col, " to Decimal")
+                cols[n] = 0
             n = n + 1
         
         lines.append(cols)
