@@ -99,10 +99,11 @@ struct Asteroid
         }
     }
 
-    bool loadmdl(const char *mdlname)
+    bool loadmdl(const char *mdlname, const char *logfile)
     {
         //copystring(name, mdlname);
-        log = openrawfile("test.csv", "w+");
+        string logfullfilename = string("../output/") + string(logfile);
+        log = openrawfile(logfullfilename.c_str(), "w+");
 
         readcfg(mdlname);
 

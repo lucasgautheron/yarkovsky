@@ -32,13 +32,15 @@ int main(int argc, char *argv[])
         printf("Set to perform %d loops before stopping.\n", nloops);
     }
 
-    asteroid1.loadmdl(argv[1]);
+    
+
+    asteroid1.loadmdl(argv[1], argc > 3 ? argv[3] : "default.csv");
     asteroid1.time = 0.0;
     asteroid1.angle = vec(0, 0, 0);
 
     double minstep = (1.0*1.0) / (TEMPDIV * TEMPDIV * asteroid1.diffusivity);
     if(asteroid1.timestep > minstep)
-        printf("Attention: pas de temps trop eleve, la simulation ne convergera pas (max dt: %e s)\n", minstep);
+        printf("warning: timestep is too high for the simulation to properly converge (max dt: %e s)\n", minstep);
 
     // main loop
 #ifdef GUI

@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -Wall -O3 -fopenmp
+CFLAGS = -Wall -O0 -g -fopenmp
 EXEC_NAME = phys
 INCLUDES =  -I../include/ `sdl-config --cflags`
 LIBS = -lm `sdl-config --libs` -lz  -fopenmp -lSDL -lSDL_image -lz 
