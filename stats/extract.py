@@ -48,7 +48,7 @@ means = [0] * len(lines[0])
 for l in lines:
     if l[0] > stop:
         print("reached ", l[0], " > ", stop)
-        break
+        continue
 
     means = [x + y for x, y in zip(means, l)]
     count = count + 1
