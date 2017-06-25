@@ -104,8 +104,6 @@ struct Model
                 f->area = ((*f->vertices[1]-*f->vertices[0])^(*f->vertices[2]-*f->vertices[0])).norm()/2.0;
                 f->depth = 5.0;
 
-                f->h = min(f->depth, fabs(f->n.dot(*f->vertices[0])));
-
                 if(has_normal)
                 {
                     f->n = *normals[ni[0]-1];
@@ -115,6 +113,8 @@ struct Model
                     f->n = (f->vertices[1]-f->vertices[0])^(f->vertices[2]-f->vertices[0]);
                     f->n.normalize();
                 }
+
+                f->h = min(f->depth, fabs(f->n.dot(*f->vertices[0])));
 
                 // FIXME: s'assurer que les vecteurs normaux sont bien normalisés ?
                 // L'erreur sur la norme est minime mais existe (blender doit faire ça grossièrement)
