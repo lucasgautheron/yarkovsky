@@ -52,6 +52,7 @@ for l in lines:
     means = [x + y for x, y in zip(means, l)]
     count = count + 1
 
+print("Extracted ", count, " elements")
 means = [x/count for x in means]
 
 
