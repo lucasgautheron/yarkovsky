@@ -1,4 +1,4 @@
-#define TEMPDIV 128     // divisions spatiales
+#define TEMPDIV 256     // divisions spatiales
                         // (pour resoudre dT/dt = div . (grad T))
 
 struct Face
@@ -114,7 +114,11 @@ struct Model
                     f->n.normalize();
                 }
 
-                f->h = min(f->depth, fabs(f->n.dot(*f->vertices[0])));
+                f->h = fabs(f->n.dot(f->pos));
+                if (f->h < f->depth)
+                {
+                    printf("warning: tetrahedron is not deep enough (%.2f, %.2f)\n", f->h, f->depth);
+                }
 
                 // FIXME: s'assurer que les vecteurs normaux sont bien normalisés ?
                 // L'erreur sur la norme est minime mais existe (blender doit faire ça grossièrement)

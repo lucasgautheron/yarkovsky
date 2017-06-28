@@ -65,6 +65,7 @@ struct Asteroid
     
     int loops;
     stream *log;
+    stream *templog;
 
     void calcsolid(); // calcule le volume, le centre de masse, etc.
     void calcimatrix(); // calcule la matrice d'inertie
@@ -104,6 +105,7 @@ struct Asteroid
         //copystring(name, mdlname);
         string logfullfilename = string("../output/") + string(logfile);
         log = openrawfile(logfullfilename.c_str(), "w+");
+        templog = openrawfile("../output/temp.csv", "w+");
 
         readcfg(mdlname);
 
@@ -189,7 +191,9 @@ struct Asteroid
     ~Asteroid()
     {
         if(log) log->close();
+        if(templog) templog->close();
         DELETEP(log);
+        DELETEP(templog);
         DELETEP(mdl);
     }
 };
