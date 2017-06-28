@@ -1,4 +1,4 @@
-#define TEMPDIV 128     // divisions spatiales
+#define TEMPDIV 256     // divisions spatiales
                         // (pour resoudre dT/dt = div . (grad T))
 
 struct Face
@@ -102,14 +102,23 @@ struct Model
                 // chargement d'une face (triangle)
                 // nécessite : vecteurs normaux, pas de rectangles, pas de textures
 			    unsigned int vi[3], ni[3];
+                int pointer = ftell(fp);
+                bool has_normal = true;
 			    int matches = fscanf(fp, "%d//%d %d//%d %d//%d\n", &vi[0], &ni[0], &vi[1], &ni[1], &vi[2], &ni[2]);
                 
                 Face *f = new Face();
 
                 if(matches != 6)
                 {
-                    printf("Erreur lors de la lecture du modele (face incorrecte)\n");
-                    break;
+                    fseek(fp, pointer, SEEK_SET);
+                    matches = fscanf(fp, "%d %d %d\n", &vi[0], &vi[1], &vi[2]);
+                    has_normal = false;
+
+                    if(matches != 3)
+                    {
+                        printf("Erreur lors de la lecture du modele (face incorrecte - %d matches)\n", matches);
+                        break;
+                    }                    
                 }
                 ++tris;
                 f->vertices[0] = vertices[vi[0]-1];
@@ -118,7 +127,27 @@ struct Model
                 f->pos = (*f->vertices[0] + *f->vertices[1] + *f->vertices[2])/3.0;
                 f->area = ((*f->vertices[1]-*f->vertices[0])^(*f->vertices[2]-*f->vertices[0])).norm()/2.0;
                 f->depth = 5.0;
-                f->h = fabs(f->n.dot(*f->vertices[0]));
+
+                if(has_normal)
+                {
+                    f->n = *normals[ni[0]-1];
+                }
+                else
+                {
+                    f->n = (f->vertices[1]-f->vertices[0])^(f->vertices[2]-f->vertices[0]);
+                    f->n.normalize();
+                }
+
+                f->h = fabs(f->n.dot(f->pos));
+                if (f->h < f->depth)
+                {
+                    printf("warning: tetrahedron is not deep enough (%.2f, %.2f)\n", f->h, f->depth);
+                }
+
+                // FIXME: s'assurer que les vecteurs normaux sont bien normalisés ?
+                // L'erreur sur la norme est minime mais existe (blender doit faire ça grossièrement)
+                // Par contre il y a risque d'introduire une erreur sur la direction ?
+                if(f->n.dot(*f->vertices[0]) < 0) f->n = -f->n;
 
                 vertices_faces[vi[0]-1]->push_back(f);
                 vertices_faces[vi[1]-1]->push_back(f);
@@ -133,12 +162,6 @@ struct Model
                     if(f->vertices[2]->v[j] < f->min[j]) f->min[j] = f->vertices[2]->v[j];
                     if(f->vertices[2]->v[j] > f->max[j]) f->max[j] = f->vertices[2]->v[j];
                 }
-
-                // FIXME: s'assurer que les vecteurs normaux sont bien normalisés ?
-                // L'erreur sur la norme est minime mais existe (blender doit faire ça grossièrement)
-                // Par contre il y a risque d'introduire une erreur sur la direction ?
-                f->n = *normals[ni[0]-1];
-                if(f->n.dot(*f->vertices[0]) < 0) f->n = -f->n;
 			    faces.push_back(f);
 
 		    }

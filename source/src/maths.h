@@ -319,12 +319,39 @@ inline matrix &ROTATION_MATRIX(double theta, double phi, double psi)
     return m;
 }
 
-inline double det3x3(vec &a, vec &b, vec &c)
+// rotation matrix that brings a to b
+inline void getrotationmatrix(matrix &m, const vec &a, const vec &b)
+{
+    vec _a = a, _b = b;
+    _a.normalize();
+    _b.normalize();
+
+    vec v = _a ^ _b;
+    double s = v.norm(), c = _a.dot(_b);
+
+    m.identity(3);
+
+    matrix as(3, 3);
+    as[0][0] = as[1][1] = as[2][2] = 0;
+    as[0][1] = -v.z;
+    as[1][0] = +v.z;
+    as[0][2] = +v.y;
+    as[2][0] = -v.y;
+    as[2][1] = +v.x;
+    as[1][2] = -v.x;
+
+    m += as;
+    as = as * as;
+    as.div(1+c);
+    m += as; 
+}
+
+inline double det3x3(const vec &a, const vec &b, const vec &c)
 {
     return (a^b).dot(c);
 }
 
-inline double det3x3(matrix &m)
+inline double det3x3(const matrix &m)
 {
     vec a(m[0][0], m[0][1], m[0][2]),
         b(m[1][0], m[1][1], m[1][2]),
@@ -333,7 +360,7 @@ inline double det3x3(matrix &m)
 }
 
 // Retourne la matrice d'inertie par rapport à (0, 0, 0) définie par 4 sommets (0, 0, 0) et a, b, c.
-inline matrix tetrahedronmatrix(vec a, vec b, vec c)
+inline matrix tetrahedronmatrix(const vec &a, const vec &b, const vec &c)
 {
     matrix im = matrix(3, 3);
     matrix cov(vec(1.0/60.0,  1.0/120.0,  1.0/120.0),

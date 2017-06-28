@@ -127,20 +127,14 @@ inline void Asteroid::calctemperature(Face *f)
     const double depth = 0.5;
     const double dz = depth/double(TEMPDIV);
 
+    //#define DERIV(i) ((f->temp[i+1]-f->temp[i] + f->temp[i]-f->temp[i-1])/(2*dz))
+    #define DERIV(i) ((f->temp[i+1]-f->temp[i])/dz)
     for(int i = 1; i < TEMPDIV - 1; ++i)
     {
-        /*double dT = 0;
-        if(f->neighbors.size())
-        {
-            for(int j = 0; j < f->neighbors.size(); ++j)
-            {
-                dT += (f->neighbors[j]->temp[i] - f->temp[i]) * (fabs(f->neighbors[j]->pos.dot(f->x_axis)) + fabs(f->neighbors[j]->pos.dot(f->y_axis)));
-            }
-            dT *= timestep * diffusivity / (f->neighbors[0]->pos-f->pos).squaredlen();
-            //dT /= float(f->neighbors.size());
-        }*/
-        f->tempn[i] = f->temp[i] + timestep * diffusivity * ( (f->temp[i+1] - 2*f->temp[i] + f->temp[i-1]) / (dz * dz) + (f->temp[i+1]-f->temp[i-1]) / (2*dz * (i*dz - f->h)));
+        const double surf_derivative = 1/(f->h * (1-i*dz/f->h));
+        f->tempn[i] = f->temp[i] + timestep * diffusivity * ( (f->temp[i+1] - 2*f->temp[i] + f->temp[i-1]) / (dz * dz) + surf_derivative * DERIV(i));
     }
+    #undef DERIV
 
     double light = f->viewfactor >= 0 ? (1-albedo) * (f->viewfactor * C_SOLARFLUX / (pos.squaredlen())) : 0;
     f->tempn[0] = f->tempn[1] + (dz/conductivity) * (light - pow(f->temp[0], 4) * C_STEFANBOLTZMANN);
@@ -158,7 +152,13 @@ void Asteroid::calcemitted()
     // calcule la temperature
     //mdl->faces[i]->temperature = mdl->faces[i]->eqtemperature + 50 * mdl->faces[i]->viewangle.back();
     #pragma omp parallel for
-        for(int i = 0; i < mdl->faces.size(); ++i) calctemperature(mdl->faces[i]);
+    for(int i = 0; i < mdl->faces.size(); ++i) calctemperature(mdl->faces[i]);
+    
+    for(int i = 0; i < TEMPDIV; ++i)
+    {
+        templog->printf("%.3f %d %.5f\n", time, i, mdl->faces[mdl->faces.size()/4]->temp[i]);
+    }
+    templog->printf("\n");
 
     for(int i = 0; i < mdl->faces.size(); ++i)
     {
@@ -273,6 +273,9 @@ void Asteroid::calcloop()
 {
     calcgravity();
     calcemitted();
+    matrix m(3, 3);
+    getrotationmatrix(m, pos, vec(0, 0, -1));
+    //m.print();
 
     move(timestep);
     time += timestep;
