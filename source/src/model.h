@@ -17,7 +17,7 @@ struct Face
 struct Model
 {
     const char *filename;
-    double scale;
+    double scale, size;
 
     std::vector<vec *> vertices; // model vertices (x, y, z)
     std::vector<vec *> normals; // precalculated normals
@@ -151,7 +151,7 @@ struct Model
 
         o = (bbmax+bbmin)/2.0;
         delta = bbmax-bbmin;
-        double size = max(delta.x, max(delta.y, delta.z));
+        size = max(delta.x, max(delta.y, delta.z));
 
         DELETEV(normals);
         return true;

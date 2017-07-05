@@ -277,6 +277,16 @@ public:
     }
     bool operator!=(const matrix &m) const { return !(m == *this); }
 
+    double *array()
+    {
+       double *arr = new double[rows*cols];
+       for(int i = 0; i < rows; ++i) for(int j = 0; j < cols; ++j)
+       {
+         arr[i+rows*j] = elems[i][j];
+       }
+       return arr;
+    }
+
     void print()
     {
         printf("\n");

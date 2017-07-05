@@ -8,6 +8,7 @@
 #include <time.h>
 #include <limits.h>
 #include <vector>
+#include <algorithm>
 #include <sstream>
 #include <stdarg.h>
 #include <math.h>

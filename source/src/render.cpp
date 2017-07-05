@@ -7,7 +7,7 @@ SDL_Surface *screen = NULL;
 
 vec angle(0,0,0);
 double zoom = 0.01;
-int w = 1024, h = 768;
+int w = 1920, h = 1080;
 
 void init_sdl()
 {
@@ -20,20 +20,12 @@ void init_sdl()
     screen = SDL_SetVideoMode(w, h, 32, SDL_OPENGL | SDL_SWSURFACE | SDL_DOUBLEBUF | SDL_RESIZABLE);
 
     SDL_WM_SetCaption("Asteroid", NULL);
-    //TTF_Init();
-    //load_fonts();
-
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0);				// fond noir
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, double(w)/double(h), 1.0, 500.0);
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     glEnable(GL_DEPTH_TEST);
-    gluLookAt(4,3,3,0,0,0,0,1,0);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    float col[] = { 1.0, 1.0, 1.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, col);
 
 }
 
@@ -49,29 +41,36 @@ void auto_ortho(double scale, double z_scale)
     double x_scale = scale, y_scale = scale;
     if(w>h) y_scale *= double(h)/double(w);
     else x_scale *= double(h)/double(w);
+    glViewport (0, 0, w, h) ;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-x_scale, x_scale, -y_scale, y_scale, -z_scale, z_scale);
+    //glOrtho(-x_scale, x_scale, -y_scale, y_scale, -z_scale, z_scale);
+    
+    //glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
+    glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    matrix m(4, 4);
+    for(int i = 0; i < 4; ++i) for(int j = 0; j < 4; ++j)
+    {
+        if(i < 3 && j < 3) m[i][j] = asteroid1.rotmatrix[i][j];
+        else if (i != j) m[i][j] = 0;
+        else m[i][j] = 1;
+    }
+    double *arr = m.array();
+    glLoadMatrixd(arr);
+    glTranslated(-asteroid1.centerofmass.x, -asteroid1.centerofmass.y, -asteroid1.centerofmass.z);
+    delete[] arr;
 }
 
 void render()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    float pos[]={-1.0,1.0,-2.0,1.0};        // position camera
-    glLightfv(GL_LIGHT0,GL_POSITION,pos);
-    glTranslatef(0.0,0.0,-60.0);
-    glRotated(angle.x/*+(asteroid1.angle.x*RAD2DEG)*/,1,0,0);
-    glRotated(angle.y/*+(asteroid1.angle.y*RAD2DEG)*/,0,1,0);
-    glRotated(angle.z/*+(asteroid1.angle.z*RAD2DEG)*/,0,0,1);
-    glColor3d(1.0, 1.0, 1.0);
-    glScaled(zoom, zoom, zoom);
-    extern bool paused;
-    renderframe();
-    if(!paused) rendermodel(*asteroid1.mdl);
-#ifdef SEASONAL
-    rendervoxel(asteroid1.mdl->voxel);
-#endif
+    auto_ortho(1, 1);
+    //renderframe();
+    rendermodelfaces(*asteroid1.mdl);
     SDL_GL_SwapBuffers();
 }
 
@@ -187,6 +186,24 @@ void rendermodel(Model &mdl)
 		glVertex3dv((mdl.bbmin+delta_x).v); glVertex3dv((mdl.bbmin+delta_z+delta_x).v);
 		glVertex3dv((mdl.bbmin+delta_y).v); glVertex3dv((mdl.bbmin+delta_z+delta_y).v);
 		glVertex3dv((mdl.bbmin+delta_x+delta_y).v); glVertex3dv((mdl.bbmin+delta_z+delta_x+delta_y).v);
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
+void rendermodelfaces(Model &mdl)
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_TRIANGLES);
+    for(int i = 0; i < mdl.faces.size(); ++i)
+    {
+        int r, g, b;
+        face_to_color(i, r, g, b);
+        glColor3ub(r, g, b);
+        glNormal3dv(mdl.faces[i]->n.v);
+        glVertex3dv(mdl.faces[i]->vertices[0]->v);
+        glVertex3dv(mdl.faces[i]->vertices[1]->v);
+        glVertex3dv(mdl.faces[i]->vertices[2]->v);
+    }
     glEnd();
     glEnable(GL_LIGHTING);
 }
