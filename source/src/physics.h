@@ -35,6 +35,7 @@ struct Asteroid
 
     // variables internes
     double time, timestep; // (s)
+    double nextvisibilitycompute;
 
     vec centerofmass; // centre de masse (m)
     matrix inertia; // matrice d'inertie (kg.m²)
@@ -98,6 +99,8 @@ struct Asteroid
             vel[i] = accel[i] = rotaccel[i] = 0.0;
             momentum[i] = 0.0;
         }
+
+        nextvisibilitycompute = 0;
     }
 
     bool loadmdl(const char *mdlname, const char *logfile)

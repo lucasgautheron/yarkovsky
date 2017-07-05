@@ -13,6 +13,7 @@
 #include <math.h>
 #include <omp.h>
 #include <ctime>
+#include <algorithm>
 
 #if defined(WIN32)
     #include <ppl.h>

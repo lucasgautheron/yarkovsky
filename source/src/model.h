@@ -11,6 +11,7 @@ struct Face
     double viewfactor;
     double h; // hauteur en m
     bool enlightened;
+    double visibility;
     std::vector<OctreeNode *> nodes;
 };
 
@@ -47,8 +48,13 @@ struct Model
 
         octree->size = max(delta.x, max(delta.y, delta.z));
         octree->midpoint = (bbmin+bbmax)/2.0;
-        octree->min = bbmin;
-        octree->max = bbmax;
+        octree->min = vec(octree->midpoint.x-octree->size/2.,
+                          octree->midpoint.y-octree->size/2., 
+                          octree->midpoint.z-octree->size/2.);
+
+        octree->max = vec(octree->midpoint.x+octree->size/2.,
+                          octree->midpoint.y+octree->size/2., 
+                          octree->midpoint.z+octree->size/2.);
         
         for(unsigned int i = 0; i < faces.size(); ++i)
         {

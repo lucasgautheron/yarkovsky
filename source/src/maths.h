@@ -376,8 +376,65 @@ inline matrix tetrahedronmatrix(const vec &a, const vec &b, const vec &c)
     return im;
 }
 
-#define EPSILON 1e-10
-//#define TEST_CULL 1 
+
+#define EPSILON 1e-7
+#define CMP(x,y) (fabs(x-y) < EPSILON)
+
+inline bool ray_intersects_box(const vec &_min, const vec &_max, const vec &x0, const vec &n)
+{
+	// Any component of direction could be 0!
+	// Address this by using a small number, close to
+	// 0 in case any of directions components are 0
+	float t1 = (_min.x - x0.x) / (CMP(n.x, 0.0f) ? 0.00001f : n.x);
+	float t2 = (_max.x - x0.x) / (CMP(n.x, 0.0f) ? 0.00001f : n.x);
+	float t3 = (_min.y - x0.y) / (CMP(n.y, 0.0f) ? 0.00001f : n.y);
+	float t4 = (_max.y - x0.y) / (CMP(n.y, 0.0f) ? 0.00001f : n.y);
+	float t5 = (_min.z - x0.z) / (CMP(n.z, 0.0f) ? 0.00001f : n.z);
+	float t6 = (_max.z - x0.z) / (CMP(n.z, 0.0f) ? 0.00001f : n.z);
+
+	float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+	float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+
+	// if tmax < 0, ray is intersecting AABB
+	// but entire AABB is behing it's origin
+	if (tmax < 0) {
+		return false;
+	}
+
+	// if tmin > tmax, ray doesn't intersect AABB
+	if (tmin > tmax) {
+		return false;
+	}
+
+	return true;
+}
+
+inline bool ray_intersects_triangle(const vec &v1, const vec &v2, const vec &v3, const vec &orig, const vec &dir)
+{
+    vec e1 = v2, e2 = v3;
+    e1.sub(v1);
+    e2.sub(v1);
+    vec n = e1^e2;
+    n.normalize();
+    vec q = dir^e2;
+    double a = e1.dot(q);
+
+    if(n.dot(dir) >= 0 || (fabs(a) <= EPSILON)) return false;
+
+    vec s = orig;
+    s.sub(v1);
+    s.div(a);
+    vec r = s^e1;
+    
+    vec b = vec(s.dot(q), r.dot(dir), 0);
+    b.z = 1-b.x-b.y;
+    
+    if((b.x < 0) || (b.y < 0) || (b.z < 0)) return false;
+    double t = e2.dot(r);
+    return t >= 0; 
+}
+
+/*#define TEST_CULL 1 
 inline bool ray_intersects_triangle(vec& v1, vec& v2, vec& v3, vec& orig, vec& dir)
 {
  vec e1,e2,pvec,qvec,tvec;
@@ -435,5 +492,5 @@ if (v < 0.0f || v + u > det)
  }
 #endif
  return true;
-}
+}*/
 #undef EPSILON

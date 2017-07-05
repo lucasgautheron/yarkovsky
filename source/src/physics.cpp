@@ -24,12 +24,12 @@ void Asteroid::calcsolid()
     for(unsigned int i = 0; i < mdl->faces.size(); ++i)
     {
         surface += mdl->faces[i]->area;
-        double vol = fabs(det3x3(*mdl->faces[i]->vertices[0], *mdl->faces[i]->vertices[1], *mdl->faces[i]->vertices[2]));
+        double vol = det3x3(*mdl->faces[i]->vertices[0], *mdl->faces[i]->vertices[1], *mdl->faces[i]->vertices[2]);
         tmp_cm += (*mdl->faces[i]->vertices[0]+*mdl->faces[i]->vertices[1]+*mdl->faces[i]->vertices[2])*vol;
         totalvolume += vol;
     }
     centerofmass = (tmp_cm/(4.0*totalvolume));
-    volume = totalvolume/6.0; 
+    volume = fabs(totalvolume/6.0); 
     mass = volume*density;
 }
 
@@ -94,29 +94,57 @@ void Asteroid::calcviewfactors()
     double distance_to_sun = pos.norm();
     vec raydir = pos;
     raydir.normalize(1);
+    matrix inverse = rotmatrix;
+    inverse.transpose();
+    raydir.mul(inverse);
+    vec mraydir = raydir;
+    mraydir.mul(-1);
+
+    printf("%f %f %f\n", raydir.x, raydir.y, raydir.z);
+
+    // recompute visibility every percent
+    /*if(time <= nextvisibilitycompute)
+    {
+        #pragma omp parallel for
+        for(int i = 0; i < mdl->faces.size(); ++i)
+        {
+            Face *f = mdl->faces[i];
+            f->enlightened = true;
+            f->visibility = 1;
+
+            vec origins[4] = { f->pos, *f->vertices[0], *f->vertices[1], *f->vertices[2] };
+
+            int hidden = 0;
+            for(int k = 0; k < 4; ++k)
+            {
+                vector<Face *> faces;
+                faces_intersecting_ray(origins[k], raydir, faces, mdl->octree, f);
+
+                printf("faces %d\n", faces.size());
+                for(int j = 0; j < faces.size(); ++j)
+                {
+                    Face *tf = mdl->faces[j];
+                    if (ray_intersects_triangle(*tf->vertices[0], *tf->vertices[1], *tf->vertices[2], origins[k], mraydir))
+                    {
+                        ++hidden;
+                        f->enlightened = false;
+                    }                  
+                }
+
+                
+            }
+            printf("Hidden = %d\n", hidden);           
+        }
+        nextvisibilitycompute = time + 0.01 * period;
+    }*/
 
     #pragma omp parallel for
     for(int i = 0; i < mdl->faces.size(); ++i)
     {
         Face *f = mdl->faces[i];
-        f->enlightened = true;
-        vec n = f->n;
-
-        /*for(int j = 0; j < mdl->faces.size(); ++j)
-        {
-            if (j == i) continue;
-            Face *tf = mdl->faces[j];
-            vec delta = f->pos - tf->pos;
-            // if light meets test face first AND same raylight intersects both
-            if (delta.dot(raydir) < 0 && ray_intersects_triangle(*f->vertices[0], *f->vertices[1], *f->vertices[2], tf->pos, raydir))
-            {
-                f->enlightened = false;
-                break;
-            }
-        }*/
-
+        vec n = -f->n;
         n.mul(rotmatrix);
-        f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : -0.0001;
+        f->viewfactor = n.dot(pos)/distance_to_sun;
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
 }

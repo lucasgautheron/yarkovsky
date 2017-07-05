@@ -26,3 +26,5 @@ struct OctreeNode
     void divide();
     void compute_center_of_mass();
 };
+
+void faces_intersecting_ray(const vec &x0, const vec &n, vector<Face *> &faces, OctreeNode *octree, Face *ignore = NULL);

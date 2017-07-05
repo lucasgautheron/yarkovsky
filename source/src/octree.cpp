@@ -9,6 +9,24 @@ inline bool bounding_boxes_intersect(const vec &min1, const vec &max1, const vec
            (min1.z <= max2.z) && (max1.z >= min2.z);
 }
 
+void faces_intersecting_ray(const vec &x0, const vec &n, vector<Face *> &faces, OctreeNode *octree, Face *ignore)
+{
+    for(int i = 0; i < 8; ++i)
+    {     
+        if(!ray_intersects_box(octree->children[i]->min, octree->children[i]->max, x0, n)) continue;
+
+        if (octree->children[i]->leaf)
+        {
+            if( octree->children[i]->faces.size() && octree->children[i]->faces[0] != ignore && find(faces.begin(), faces.end(), octree->children[i]->faces[0]) == faces.end() )
+                faces.push_back(octree->children[i]->faces[0]);
+        }
+        else
+        {
+            faces_intersecting_ray(x0, n, faces, octree->children[i], ignore);
+        }
+    }
+}
+
 void OctreeNode::insert(Face *f, bool move)
 {
     if(!move)
