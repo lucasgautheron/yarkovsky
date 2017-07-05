@@ -122,6 +122,8 @@ void Asteroid::calcviewfactors()
 
 #endif
 
+    int mismatch = 0;
+
     #pragma omp parallel for
     for(int i = 0; i < mdl->faces.size(); ++i)
     {
@@ -130,9 +132,13 @@ void Asteroid::calcviewfactors()
         vec n = f->n;
 
         n.mul(rotmatrix);
+
+        if(f->enlightened && n.dot(pos) > 0) mismatch++;
+
         f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : 0;
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
+    printf("MISMATCH: %d\n", mismatch);
 }
 
 // Calcul de la temperature.

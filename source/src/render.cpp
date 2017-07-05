@@ -7,7 +7,7 @@ SDL_Surface *screen = NULL;
 
 vec angle(0,0,0);
 double zoom = 0.01;
-int w = 1920, h = 1080;
+int w = 1024, h = 1024;
 
 void init_sdl()
 {
@@ -29,13 +29,6 @@ void init_sdl()
 
 }
 
-void load_fonts()
-{
-    //fonts.push_back(new GPFont("consola.ttf", 12));
-    //fonts.push_back(new GPFont("arial.ttf", 12));
-    //fonts.push_back(new GPFont("consola.ttf", 12));
-}
-
 void auto_ortho(double scale, double z_scale)
 {
     double x_scale = scale, y_scale = scale;
@@ -44,12 +37,13 @@ void auto_ortho(double scale, double z_scale)
     glViewport (0, 0, w, h) ;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(-x_scale, x_scale, -y_scale, y_scale, -z_scale, z_scale);
     
-    //glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
-    glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
+    glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
+    //glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
 
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslated(-asteroid1.centerofmass.x, -asteroid1.centerofmass.y, -asteroid1.centerofmass.z);
 
     matrix m(4, 4);
     for(int i = 0; i < 4; ++i) for(int j = 0; j < 4; ++j)
@@ -59,8 +53,7 @@ void auto_ortho(double scale, double z_scale)
         else m[i][j] = 1;
     }
     double *arr = m.array();
-    glLoadMatrixd(arr);
-    glTranslated(-asteroid1.centerofmass.x, -asteroid1.centerofmass.y, -asteroid1.centerofmass.z);
+    glLoadMatrixd(arr);  
     delete[] arr;
 }
 
@@ -72,26 +65,6 @@ void render()
     //renderframe();
     rendermodelfaces(*asteroid1.mdl);
     SDL_GL_SwapBuffers();
-}
-
-void draw_text(const char *text, double x, double y, double z, int r, int g, int b, int font)
-{
-    /*glPushMatrix();
-
-    glTranslated(x, y, z);
-    glColor3ub(r, g, b);
-
-    GPFont *ttf_font = (font >= 0 && font < fonts.size()) ? fonts[font] : fonts.back();
-    if(!ttf_font) return;
-    ttf_font->Print2D(text);
-    glPopMatrix();*/
-}
-
-void draw_label(string text, int x, int y)
-{
-    int width = text.length() * 9, height = 25;
-
-    draw_text(text.c_str(), (w-width)/2, 10, 0, 255, 255, 255);
 }
 
 void renderframe()
