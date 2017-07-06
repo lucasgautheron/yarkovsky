@@ -24,12 +24,12 @@ void Asteroid::calcsolid()
     for(unsigned int i = 0; i < mdl->faces.size(); ++i)
     {
         surface += mdl->faces[i]->area;
-        double vol = fabs(det3x3(*mdl->faces[i]->vertices[0], *mdl->faces[i]->vertices[1], *mdl->faces[i]->vertices[2]));
+        double vol = det3x3(*mdl->faces[i]->vertices[0], *mdl->faces[i]->vertices[1], *mdl->faces[i]->vertices[2]);
         tmp_cm += (*mdl->faces[i]->vertices[0]+*mdl->faces[i]->vertices[1]+*mdl->faces[i]->vertices[2])*vol;
         totalvolume += vol;
     }
     centerofmass = (tmp_cm/(4.0*totalvolume));
-    volume = totalvolume/6.0; 
+    volume = fabs(totalvolume/6.0); 
     mass = volume*density;
 }
 
@@ -98,31 +98,28 @@ void Asteroid::calcviewfactors()
 #ifdef GUI
     for(int i = 0; i < mdl->faces.size(); ++i) mdl->faces[i]->enlightened = false;
 
-    vector<Face *> faces;
-    int w = 1920, h = 1080;
-    uchar *buf = new uchar[3*w*h];
-    
-    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, buf);
+    uchar *buf = new uchar[4*w*h];
+    glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
     for(int i = 0; i < w; ++i) for(int j = 0; j < h; ++j)
     {
-        uchar *rgb = &buf[3*(j*w+i)];
+        uchar *rgb = &buf[4*(j*w+i)];
         int f = rgb[0] | (rgb[1] << 8) | (rgb[2] << 16);
         if (!f) continue;
         f -= 1;
 
-        if (f >= 0 && f < mdl->faces.size() &&
-            find(faces.begin(), faces.end(), mdl->faces[f]) == faces.end())
-            faces.push_back(mdl->faces[f]);
+        if (f >= 0 && f < mdl->faces.size())
+        {
+            mdl->faces[f]->enlightened = true;
+        }
     }
 
-    for(int i = 0; i < faces.size(); ++i)
-        faces[i]->enlightened = true;
-
-    printf("%d faces enlightened\n", faces.size());
+    delete[] buf;
 
 #endif
 
-    int mismatch = 0;
+    int mismatch = 0,
+        enlightened = 0;
 
     #pragma omp parallel for
     for(int i = 0; i < mdl->faces.size(); ++i)
@@ -133,12 +130,13 @@ void Asteroid::calcviewfactors()
 
         n.mul(rotmatrix);
 
+        if(f->enlightened) enlightened++;
         if(f->enlightened && n.dot(pos) > 0) mismatch++;
 
         f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : 0;
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
-    printf("MISMATCH: %d\n", mismatch);
+    printf("MISMATCH: %d\nENLIGHTENED: %d\n", mismatch, enlightened);
 }
 
 // Calcul de la temperature.
