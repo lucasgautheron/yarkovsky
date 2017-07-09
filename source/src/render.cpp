@@ -35,15 +35,37 @@ void auto_ortho(double scale, double z_scale)
     if(w>h) y_scale *= double(h)/double(w);
     else x_scale *= double(h)/double(w);
     glViewport (0, 0, w, h) ;
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+
+    /*vec bbmin = asteroid1.mdl->bbmin,
+        bbmax = asteroid1.mdl->bbmax;
+    bbmin -= asteroid1.centerofmass;
+    bbmax -= asteroid1.centerofmass;
+
+    bbmin.mul(asteroid1.rotmatrix);
+    bbmax.mul(asteroid1.rotmatrix);
+
+    bbmin += asteroid1.centerofmass;
+    bbmax += asteroid1.centerofmass;*/
+
+    //glOrtho(bbmin.x, bbmax.x, bbmin.y, bbmax.y, bbmin.z, bbmax.z);
     
-    glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
-    //glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
+    //glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
+    glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslated(-asteroid1.centerofmass.x, -asteroid1.centerofmass.y, -asteroid1.centerofmass.z);
+
+    vec dir = asteroid1.pos;
+    dir.normalize(10);
+
+    //gluLookAt(-1, 0, 0,
+    gluLookAt(-dir.x, -dir.y, -dir.z,
+              0, 0, 0,
+              asteroid1.plan.x, asteroid1.plan.y, asteroid1.plan.z);
 
     matrix m(4, 4);
     for(int i = 0; i < 4; ++i) for(int j = 0; j < 4; ++j)
@@ -53,7 +75,7 @@ void auto_ortho(double scale, double z_scale)
         else m[i][j] = 1;
     }
     double *arr = m.array();
-    glLoadMatrixd(arr);  
+    glMultMatrixd(arr);  
     delete[] arr;
 }
 
