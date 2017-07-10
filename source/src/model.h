@@ -25,6 +25,7 @@ struct Model
     std::vector< std::vector<Face *> *> vertices_faces;
 
     vec bbmin, bbmax, delta, o; // model bounds
+    vec bounds[8];
 
     int tris;
 
@@ -33,6 +34,11 @@ struct Model
         bbmin = vec(1e10, 1e10, 1e10);
         bbmax = -bbmin;
         tris = 0;
+
+        for(int i = 0; i < 8; ++i) for(int j = 0; j < 3; ++j)
+        {
+            bounds[i].v[j] = i&(1<<j) ? -1e10 : +1e10;
+        }
     }
 
     bool load()
@@ -66,6 +72,13 @@ struct Model
                 if(v->x > bbmax.x) bbmax.x = v->x;
                 if(v->y > bbmax.y) bbmax.y = v->y;
                 if(v->z > bbmax.z) bbmax.z = v->z;
+
+                for(int i = 0; i < 8; ++i) for(int j = 0; j < 3; ++j)
+                {
+                    int bit = i&(1<<j);
+                    if( (bit != 0) && bounds[i].v[j] < v->v[j]) bounds[i].v[j] = v->v[j];
+                    if( (bit == 0) && bounds[i].v[j] > v->v[j]) bounds[i].v[j] = v->v[j];
+                }
 		    }
             else if (strcmp(line, "vn" ) == 0)
             {

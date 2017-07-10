@@ -7,7 +7,7 @@ SDL_Surface *screen = NULL;
 
 vec angle(0,0,0);
 double zoom = 0.01;
-int w = 1024, h = 1024;
+int w = 1024, h = 768;
 
 void init_sdl()
 {
@@ -29,40 +29,19 @@ void init_sdl()
 
 }
 
-void auto_ortho(double scale, double z_scale)
+void set_renderer()
 {
-    double x_scale = scale, y_scale = scale;
-    if(w>h) y_scale *= double(h)/double(w);
-    else x_scale *= double(h)/double(w);
-    glViewport (0, 0, w, h) ;
-    
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    static double viewmatrix[16];
 
-    /*vec bbmin = asteroid1.mdl->bbmin,
-        bbmax = asteroid1.mdl->bbmax;
-    bbmin -= asteroid1.centerofmass;
-    bbmax -= asteroid1.centerofmass;
-
-    bbmin.mul(asteroid1.rotmatrix);
-    bbmax.mul(asteroid1.rotmatrix);
-
-    bbmin += asteroid1.centerofmass;
-    bbmax += asteroid1.centerofmass;*/
-
-    //glOrtho(bbmin.x, bbmax.x, bbmin.y, bbmax.y, bbmin.z, bbmax.z);
-    
-    //glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
-    glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
+    glViewport (0, 0, w, h);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslated(-asteroid1.centerofmass.x, -asteroid1.centerofmass.y, -asteroid1.centerofmass.z);
 
     vec dir = asteroid1.pos;
-    dir.normalize(10);
+    dir.normalize(1);
 
-    //gluLookAt(-1, 0, 0,
     gluLookAt(-dir.x, -dir.y, -dir.z,
               0, 0, 0,
               asteroid1.plan.x, asteroid1.plan.y, asteroid1.plan.z);
@@ -77,13 +56,50 @@ void auto_ortho(double scale, double z_scale)
     double *arr = m.array();
     glMultMatrixd(arr);  
     delete[] arr;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, viewmatrix);
+    for(int i = 0; i < 4; ++i) for(int j = 0; j < 4; ++j)
+    {
+        m[i][j] = viewmatrix[i+4*j];
+    }
+
+    // recompute bounds for glOrtho
+    vec bounds[8];
+    for(int i = 0; i < 8; ++i)
+    {
+        bounds[i] = asteroid1.mdl->bounds[i];
+        bounds[i].mul4d(m);
+        //bounds[i] += asteroid1.centerofmass;
+    }
+
+    vec min, max;
+    vector<double> coordinates[3];
+    for(int i = 0; i < 8; ++i) for(int j = 0; j < 3; ++j)
+    {
+        coordinates[j].push_back(bounds[i].v[j]);
+    }
+
+    for(int j = 0; j < 3; ++j)
+    {
+        min.v[j] = *min_element(coordinates[j].begin(), coordinates[j].end());
+        max.v[j] = *max_element(coordinates[j].begin(), coordinates[j].end());
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    printf("(%.2f, %.2f, %.2f) (%.2f, %.2f %.2f)\n", min.x, min.y, min.z, max.x, max.y, max.z);
+    
+    glOrtho(min.x, max.x, min.y, max.y, min.z, max.z);  
+//    glOrtho(asteroid1.mdl->bbmin.x, asteroid1.mdl->bbmax.x, asteroid1.mdl->bbmin.y, asteroid1.mdl->bbmax.y, asteroid1.mdl->bbmin.z, asteroid1.mdl->bbmax.z);
+    //glOrtho(asteroid1.mdl->o.x-asteroid1.mdl->size, asteroid1.mdl->o.x+asteroid1.mdl->size, asteroid1.mdl->o.y-asteroid1.mdl->size, asteroid1.mdl->o.y+asteroid1.mdl->size, asteroid1.mdl->o.z-asteroid1.mdl->size, asteroid1.mdl->o.z+asteroid1.mdl->size);
 }
 
 void render()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    auto_ortho(1, 1);
+    set_renderer();
     //renderframe();
     rendermodelfaces(*asteroid1.mdl);
     SDL_GL_SwapBuffers();

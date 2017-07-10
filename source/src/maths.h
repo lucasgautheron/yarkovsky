@@ -71,6 +71,7 @@ public:
     vec &div(const vec &o);
 
     vec &mul(const matrix &m);
+    vec &mul4d(const matrix &m);
 
     double squaredlen() const;
     double sqrxy() const;

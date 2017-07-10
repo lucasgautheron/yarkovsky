@@ -21,6 +21,14 @@ vec &vec::mul(const matrix &m)
     return (*this = ret);
 }
 
+vec &vec::mul4d(const matrix &m)
+{
+    vec ret = vec(0, 0, 0);
+    double vv[4] = { v[0], v[1], v[2], 1 };
+    for(int i = 0; i < 3; ++i) for(int k = 0; k < 4; ++k) ret[i] += m[i][k]*vv[k];
+    return (*this = ret);
+}
+
 double vec::squaredlen() const { return x*x + y*y + z*z; }
 double vec::sqrxy() const { return x*x + y*y; }
 

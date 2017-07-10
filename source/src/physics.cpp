@@ -134,10 +134,10 @@ void Asteroid::calcviewfactors()
         if(f->enlightened && n.dot(pos) > 0) mismatch++;
         //if(!f->enlightened && n.dot(pos) < 0) mismatch++;
 
-        f->viewfactor = f->enlightened ? n.dot(pos)/distance_to_sun : 0;
+        f->viewfactor = f->enlightened ? -n.dot(pos)/distance_to_sun : 0;
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
-    printf("MISMATCH: %d\nENLIGHTENED: %d\n", mismatch, enlightened);
+    printf("MISMATCH: %d\nENLIGHTENED: %d (%.2f \%) \n", mismatch, enlightened, 100.0f*enlightened/mdl->faces.size());
 }
 
 // Calcul de la temperature.
