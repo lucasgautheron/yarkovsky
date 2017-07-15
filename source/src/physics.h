@@ -83,7 +83,7 @@ struct Asteroid
     void calcperiod();
 
     Asteroid() : loaded(false),
-        albedo(0.5), emissivity(0.5), density(2500.0),
+        albedo(0.5), emissivity(0.9), density(2500.0),
         conductivity(2.9), diffusivity(1.2e-6), initialtemperature(249.0),
         period(18720.0),
         timestep(TIMESTEP),

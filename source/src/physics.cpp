@@ -156,7 +156,7 @@ inline void Asteroid::calctemperature(Face *f)
     #undef DERIV
 
     double light = f->viewfactor >= 0 ? (1-albedo) * (f->viewfactor * C_SOLARFLUX / (pos.squaredlen())) : 0;
-    f->tempn[0] = f->tempn[1] + (dz/conductivity) * (light - pow(f->temp[0], 4) * C_STEFANBOLTZMANN);
+    f->tempn[0] = f->tempn[1] + (dz/conductivity) * (light - emissivity * pow(f->temp[0], 4) * C_STEFANBOLTZMANN);
     f->tempn[TEMPDIV-1] = f->tempn[TEMPDIV-2] = initialtemperature;
 
     for(int i = 0; i < TEMPDIV; ++i)
@@ -283,7 +283,17 @@ void Asteroid::move(double dt)
     if((loops % 10) == 0)
     {
         double da = 2 * dE * semiaxis * semiaxis / (C_SUNCONST * mass);
-        log->printf("%.3f %e %e %e %e %e %e %e %e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, da/dt, mdl->faces[0]->temp[0], mdl->faces[mdl->faces.size()/4]->temp[0], mdl->faces[2*mdl->faces.size()/4]->temp[0], mdl->faces[3*mdl->faces.size()/4]->temp[0]);
+
+        // calculate average temperature
+
+        double average_temperature = 0;
+        for(int i = 0; i < mdl->faces.size(); ++i)
+        {
+            average_temperature += mdl->faces[i]->temp[0] * mdl->faces[i]->area;
+        }
+        average_temperature /= surface;
+
+        log->printf("%.3f %e %e %e %e %e %e %e %e %e\n", time, rotaccel.norm(), rotaccel.dot(rotdir), dE, da/dt, average_temperature, mdl->faces[0]->temp[0], mdl->faces[mdl->faces.size()/4]->temp[0], mdl->faces[2*mdl->faces.size()/4]->temp[0], mdl->faces[3*mdl->faces.size()/4]->temp[0]);
         rotmatrix.print();
     }
 }
