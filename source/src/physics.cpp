@@ -129,15 +129,18 @@ void Asteroid::calcviewfactors()
         vec n = f->n;
 
         n.mul(rotmatrix);
-
+#ifdef GUI
         if(f->enlightened) enlightened++;
         if(f->enlightened && n.dot(pos) > 0) mismatch++;
-        //if(!f->enlightened && n.dot(pos) < 0) mismatch++;
-
         f->viewfactor = f->enlightened ? -n.dot(pos)/distance_to_sun : 0;
+#else
+        f->viewfactor = f->enlightened ? -n.dot(pos)/distance_to_sun : 0;
+#endif
         //f->viewfactor = f->enlightened ? 1 : -1;
     }
+#ifdef GUI
     printf("MISMATCH: %d\nENLIGHTENED: %d (%.2f \%) \n", mismatch, enlightened, 100.0f*enlightened/mdl->faces.size());
+#endif
 }
 
 // Calcul de la temperature.
