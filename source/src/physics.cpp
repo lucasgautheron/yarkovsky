@@ -146,7 +146,7 @@ void Asteroid::calcviewfactors()
 // Calcul de la temperature.
 inline void Asteroid::calctemperature(Face *f)
 {
-    const double depth = 0.5;
+    const double depth = f->depth;
     const double dz = depth/double(TEMPDIV);
 
     //#define DERIV(i) ((f->temp[i+1]-f->temp[i] + f->temp[i]-f->temp[i-1])/(2*dz))

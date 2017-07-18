@@ -38,9 +38,20 @@ int main(int argc, char *argv[])
     asteroid1.time = 0.0;
     asteroid1.angle = vec(0, 0, 0);
 
-    double minstep = (1.0*1.0) / (TEMPDIV * TEMPDIV * asteroid1.diffusivity);
+    double minstep = (asteroid1.mdl->faces[0]->depth * asteroid1.mdl->faces[0]->depth) / (TEMPDIV * TEMPDIV * asteroid1.diffusivity);
     if(asteroid1.timestep > minstep)
-        printf("warning: timestep is too high for the simulation to properly converge (max dt: %e s)\n", minstep);
+    {
+        printf("error: timestep is too high for the simulation to properly converge (max dt: %e s)\n", minstep);
+        return 1;
+    }
+
+    printf("%e %e\n", asteroid1.mdl->faces[0]->depth / TEMPDIV, sqrt(asteroid1.diffusivity * asteroid1.period / 3.14) / 50);
+ 
+    if( asteroid1.mdl->faces[0]->depth / TEMPDIV >= sqrt(asteroid1.diffusivity * asteroid1.period / 3.14) / 50) 
+    {
+        printf("error: spatial step is too high (max dz: %e m)\n", sqrt(asteroid1.diffusivity * asteroid1.period / 3.14) / 50);
+        return 1;
+    }
 
     // main loop
 #ifdef GUI

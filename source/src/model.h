@@ -1,4 +1,4 @@
-#define TEMPDIV 256     // divisions spatiales
+#define TEMPDIV 1024    // divisions spatiales
                         // (pour resoudre dT/dt = div . (grad T))
 
 struct Face
@@ -115,7 +115,7 @@ struct Model
                 f->vertices[2] = vertices[vi[2]-1];
                 f->pos = (*f->vertices[0] + *f->vertices[1] + *f->vertices[2])/3.0;
                 f->area = ((*f->vertices[1]-*f->vertices[0])^(*f->vertices[2]-*f->vertices[0])).norm()/2.0;
-                f->depth = 5.0;
+                f->depth = 0.05;
 
                 if(has_normal)
                 {
